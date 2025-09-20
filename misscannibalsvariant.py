@@ -21,6 +21,25 @@ class MissCannibalsVariant(Problem):
         self.N2 = N2
         super().__init__(initial, goal)
         state = initial
+
+
+    # Helper function to check if the move we are making is a safe and valid move 
+    def is_bank_safe(self, m_left, c_left):
+        m_right = self.N1 - m_left
+        c_right = self.N2 - c_left
+
+        # Checking for negatives or going over total
+        if not (0 <= m_left <= self.N1 and 0 <= c_left <= self.N2):
+            return False
+        if not (0 <= m_right <= self.N1 and 0 <= c_right <= self.N2):
+            return True
+
+        # Checking if missionaries are outnumbered by cannibals
+        left_safe = (m_left == 0) or (m_left >= c_left)
+        right_safe = (m_right == 0) or (m_right >= c_right)
+        return left_safe and right_safe
+
+
     
     def result(self, state, action):
         m_left, c_left, left = state
@@ -64,7 +83,8 @@ class MissCannibalsVariant(Problem):
                 m_next = m_left - number_m
                 c_next = c_left - number_c
         
-            valid.append(i)
+            if self.is_bank_safe(m_next, c_next):
+                valid.append(i)
 
 
         return valid    
