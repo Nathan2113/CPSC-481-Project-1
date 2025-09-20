@@ -32,7 +32,7 @@ class MissCannibalsVariant(Problem):
         if not (0 <= m_left <= self.N1 and 0 <= c_left <= self.N2):
             return False
         if not (0 <= m_right <= self.N1 and 0 <= c_right <= self.N2):
-            return True
+            return False
 
         # Checking if missionaries are outnumbered by cannibals
         left_safe = (m_left == 0) or (m_left >= c_left)
@@ -68,8 +68,8 @@ class MissCannibalsVariant(Problem):
 
         valid = []
         for i in self.action:
-            number_m = self.action.count('M')
-            number_c = self.action.count('C')
+            number_m = i.count('M')
+            number_c = i.count('C')
 
         
             # Checking capacity and availability
@@ -91,10 +91,10 @@ class MissCannibalsVariant(Problem):
 
 
 if __name__ == '__main__':
-    mc = MissCannibalsVariant(4,4)
+    mc = MissCannibalsVariant(2,2)
     # print(mc.actions((3, 3, True))) # Test your code as you develop! This should return  ['MC', 'MMM']
     print(mc.result(mc.initial, None))
-    print(mc.actions((3, 3, True)))
+    print(mc.actions((2, 2, True)))
 
     #path = depth_first_graph_search(mc).solution()
     #print(path)
