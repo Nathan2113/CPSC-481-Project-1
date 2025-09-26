@@ -1,18 +1,13 @@
 from search import *
 
+
 class MissCannibalsVariant(Problem):
-    """ The problem of Missionaries and Cannibals. 
+    """ The problem of Missionaries and Cannibals.
     N1 and N2 are the total number of missionaries and cannibals starting from the left bank.
     A state is represented as a 3-tuple, two numbers and a boolean:
     state[0] is the number of missionaries on the left bank (note: the number of missionaries on the right bank is N1-m)
     state[1] is the number of cannibals on the left bank (note: the number of cannibals on the right bank is N2-c)
     state[2] is true if boat is at the left bank, false if at the right bank """
-
-    action = [
-            'M', 'C', 
-            'MM', 'MC', 'CC',
-            'MMM', 'MMC', 'MCC', 'CCC'
-    ]
 
     def __init__(self, N1=4, N2=4, goal=(0, 0, False)):
         """ Define goal state and initialize a problem """
@@ -22,82 +17,63 @@ class MissCannibalsVariant(Problem):
         super().__init__(initial, goal)
         state = initial
 
-
-    # Helper function to check if the move we are making is a safe and valid move 
-    def is_bank_safe(self, m_left, c_left):
-        m_right = self.N1 - m_left
-        c_right = self.N2 - c_left
-
-        # Checking for negatives or going over total
-        if not (0 <= m_left <= self.N1 and 0 <= c_left <= self.N2):
-            return False
-        if not (0 <= m_right <= self.N1 and 0 <= c_right <= self.N2):
-            return False
-
-        # Checking if missionaries are outnumbered by cannibals
-        left_safe = (m_left == 0) or (m_left >= c_left)
-        right_safe = (m_right == 0) or (m_right >= c_right)
-        return left_safe and right_safe
-
-
-    
     def result(self, state, action):
-        m_left, c_left, left = state
+        """Return the state that results from executing the given
+        action in the given state. The action must be one of
+        self.actions(state)."""
 
-        #print(f"Missionaries: {m}")
-        #print(f"Cannibals: {c}")
-        #print(f"onLeft: {left}")
+        m = action.count("M")
+        c = action.count("C")
 
-        #state = (m - 1, c - 1, False)
+        if (state[2] == True):
+            state_next = (state[0] - m, state[1] - c, False)
+            return state_next
+        else:
+            state_next = (state[0] + m, state[1] + c, True)
+            return state_next
 
-        #m, c, left = state
-
-        #print(f"Missionaries: {m}")
-        #print(f"Canniabls: {c}")
-        #print(f"onLeft: {left}")
-
-
-
-
-    """Returns all valid actions from the current state."""
     def actions(self, state):
-        m_left, c_left, left = state
+        """Return the actions that can be executed in the given
+        state. The result would typically be a list, but if there are
+        many actions, consider yielding them one at a time in an
+        iterator, rather than building them all at once."""
+        actions = []
+        for i in range(4):
+            for j in range(4 - i):
+                if (i == 0 and j == 0):
+                    continue
 
-        m_available = m_left if left else (self.N1 - m_left)
-        c_available = c_left if left else (self.N2 - c_left)
+                action = ""
+                for k in range(i):
+                    action += "M"
+                for k in range(j):
+                    action += "C"
 
-        valid = []
-        for i in self.action:
-            number_m = i.count('M')
-            number_c = i.count('C')
+                m, c = self.result(state, action)[:2]
+                m0, c0 = self.initial[:2]
+                m_right = m0 - m
+                c_right = c0 - c
 
-        
-            # Checking capacity and availability
-            if number_m + number_c == 0 or number_m + number_c > 3:
-                continue
-            if number_m > m_available or number_c > c_available:
-                continue
+                if (m < 0 or c < 0):
+                    continue
+                if (m > 0 and m < c):
+                    continue
+                if (m_right < 0) or (c_right < 0):
+                    continue
+                if (m_right > 0 and m_right < c_right):
+                    continue
 
-            # Move people across and compute next state
-            if left:
-                m_next = m_left - number_m
-                c_next = c_left - number_c
-        
-            if self.is_bank_safe(m_next, c_next):
-                valid.append(i)
-
-
-        return valid    
+                actions.append(action)
+        return actions
 
 
 if __name__ == '__main__':
-    mc = MissCannibalsVariant(2,2)
-    # print(mc.actions((3, 3, True))) # Test your code as you develop! This should return  ['MC', 'MMM']
-    print(mc.result(mc.initial, None))
+    mc = MissCannibalsVariant(4, 4)
+    # Test your code as you develop! This should return  ['MC', 'MMM']
+    print(mc.actions((3, 3, True)))
     print(mc.actions((2, 2, True)))
 
-    #path = depth_first_graph_search(mc).solution()
-    #print(path)
-    #path = breadth_first_graph_search(mc).solution()
-    #print(path)
-
+    path = depth_first_graph_search(mc).solution()
+    print(path)
+    path = breadth_first_graph_search(mc).solution()
+    print(path)
